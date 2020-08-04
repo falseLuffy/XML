@@ -1,5 +1,5 @@
 import uuid from './uuid'
-const tag = "<(\\w+)((\\s+([\\w][\\-\\d\\w]*?=(['\"])([^'\"<>]*?)\\5))*)*\\s*?>[^<>]*?<\\/\\1>"
+const tag = "<(\\w+)((\\s+([\\w][\\-\\d\\w]*?=(['\"])([^'\"<>]*?)\\5))*)*\\s*?>([^<>]*?)<\\/\\1>"
 const openTag = "<(\\w+)((\\s+([\\w][\\-\\d\\w]*?=(['\"])([^'\"<>]*?)\\5))*)*\\s*/>"
 export default function parse (xmlString) {
   const tagMap = {}
@@ -9,6 +9,8 @@ export default function parse (xmlString) {
   xmlString = a.xml
   const b = stringReplace(tagg, new RegExp(tag), xmlString, tagMap)
   xmlString = b.xml
+
+  console.log(tagMap)
   return Object.keys(tagMap).map(key => {
     const node = nodeParse(tagMap[key])
     return node
@@ -24,12 +26,20 @@ function stringReplace (reg1, reg2, xmlString, tagMap) {
       const identifier = '\\$\\{(.*?)\\}'
       const identifier_g = new RegExp(identifier, 'g')
 
-      const children = (item.match(identifier_g) || []).map(item => {
+      const content = (item.match(new RegExp(tag)) || [])[7] || ''
+
+      const children = (content.match(identifier_g) || []).map(item => {
         const uuid = (item.match(new RegExp(identifier)) || [])[1] || ''
         const child = tagMap[uuid]
         delete tagMap[uuid]
         return child
       })
+      content.replace(identifier_g, '&&&&')
+        .split('&&&&').forEach((item, index) => {
+          if (item.trim()) {
+            children.splice(index, 0, item.trim())
+          }
+        })
 
       xmlString = xmlString.replace(item, `\$\{${random}\}`)
 
@@ -56,15 +66,18 @@ function nodeParse (data) {
     const obj = {}
     const attr = {}
     const reg = "([\\w][\\-\\d\\w]*?)=((['\"])([^'\"<>]*?)\\3)"
-    const attrString = (data.xml.match(new RegExp(tag)) || data.xml.match(new RegExp(openTag)) || [])[2] || '';
+
+    const attrString = data.xml ? (data.xml.match(new RegExp(tag)) || data.xml.match(new RegExp(openTag)) || [])[2] || '' : ''
+    const text = data.xml ? undefined : data;
     (attrString.match(new RegExp(reg, 'g')) || [])
       .forEach(item => {
         const a = item.match(reg)
         attr[a[1]] = a[4]
       })
-    obj[data.tag] = {
+    obj[data.tag || 'text'] = {
       ...attr,
-      children: data.children.map(item => nodeParse(item))
+      text,
+      children: (data.children || []).map(item => nodeParse(item))
     }
     return obj
   }

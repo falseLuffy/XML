@@ -18,7 +18,7 @@ function generate (json, tag) {
 function node (tag, data) {
   const dataKey = Object.keys(data)
   let attrString = dataKey
-    .filter(key => typeof data[key] !== 'object')
+    .filter(key => typeof data[key] !== 'object' && key !== 'text')
     .map(key => {
       return `${key}="${data[key]}"`
     }).join(' ')
@@ -28,5 +28,6 @@ function node (tag, data) {
     .map(key => {
       return generate(data[key], key)
     })
-  return tag !== 'children' ? data.children && data.children.length ? `<${tag}${attrString}>${children}</${tag}>` : `<${tag}${attrString} />` : children
+  return tag !== 'children' ? tag !== 'text' ? data.children && data.children.length ? `<${tag}${attrString}>${children}</${tag}>` : `<${tag}${attrString} />`
+    : data.text : children
 }
