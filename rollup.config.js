@@ -35,7 +35,7 @@ const config = {
   output: {
     file: `dist/${fileName}`,
     format: 'umd',
-    name: 'OneSocket'
+    name: 'XML'
   },
   plugins: [
     resolve(),
