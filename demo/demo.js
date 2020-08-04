@@ -2,6 +2,7 @@ const str = "<?xml version='1.0' encoding='utf-8'?>\n" +
 "<root >\n" +
 "\t<dev nPclType=\"MODBUS\" nByteOrder=\"2\" nDevModel=\"ZGS11-2000\">\n" +
 "\t\t<point nDevIndex=\"1\" nDevType=\"13\" nDevModel=\"SUN2000\" />\n" +
+"fasdfafa"+
 "\t</dev>\n" +
 "\t<protocol nMinAddr=\"4\" nMaxAddr=\"65\" nDevCode=\"60100\" pDevModel=\"ZGS11-2000\" nDevType=\"OT_TRANS\" nByteOrder=\"2\">\n" +
 "\t\t<point nDevIndex=\"1\" nDevType=\"13\" nDevModel=\"SUN2000\" nDataName=\"油面温度\" nSigId=\"0X269B\" nModbusAddr=\"4\" nRegNum=\"1\" nRqstCyl=\"1\" nRegType=\"1\" nEndInquire=\"2\" fInDexP=\"1\" nInDataType=\"4\" nExpNum=\"0\" pExpInfo1=\"\" />\n" +
@@ -22,17 +23,18 @@ const str = "<?xml version='1.0' encoding='utf-8'?>\n" +
 "\t\t<point nDevIndex=\"1\" nDevType=\"13\" nDevModel=\"SUN2000\" nDataName=\"Cos1\" nSigId=\"0X200C\" nModbusAddr=\"19\" nRegNum=\"1\" nRqstCyl=\"1\" nRegType=\"1\" nEndInquire=\"2\" fInDexP=\"1\" nInDataType=\"4\" nExpNum=\"0\" pExpInfo1=\"\" />\n" +
 "\t\t<point nDevIndex=\"1\" nDevType=\"13\" nDevModel=\"SUN2000\" nDataName=\"开入量状态字1\" nSigId=\"0X2783\" nModbusAddr=\"65\" nRegNum=\"1\" nRqstCyl=\"1\" nRegType=\"1\" nEndInquire=\"2\" fInDexP=\"1\" nInDataType=\"4\" nExpNum=\"16\" pExpInfo3=\"0X26A9:In1and0X0004\" pExpInfo4=\"0X26AA:In1and0X0008\" />\n"+
 "\t</protocol>\n" +
+"<div>hello world</div>"+
 "</root>"
 console.log(str)
 let json = XML.parse(str)
 console.log(json)
-let xml = XML.generate(json)
+let xml = XML.stringify(json)
 console.log(xml)
 let json2 = XML.parse(xml)
 console.log(json2)
 
-let xml3 = XML.generate(json2)
-console.log(xml3)
+// let xml3 = XML.stringify(json2)
+// console.log(xml3)
 
-let json3 = XML.parse(xml3)
-console.log(json3)
+// let json3 = XML.parse(xml3)
+// console.log(json3)
