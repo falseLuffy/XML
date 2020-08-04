@@ -3,5 +3,5 @@ import generate from './lib/generate.js'
 
 export default {
   parse,
-  generate
+  stringify: generate
 }
