@@ -85,7 +85,7 @@
     return s.join('');
   }
 
-  var tag = "<(\\w+)((\\s+([\\w][\\-\\d\\w]*?=(['\"])([^'\"<>]*?)\\5))*)*\\s*?>[^<>]*?<\\/\\1>";
+  var tag = "<(\\w+)((\\s+([\\w][\\-\\d\\w]*?=(['\"])([^'\"<>]*?)\\5))*)*\\s*?>([^<>]*?)<\\/\\1>";
   var openTag = "<(\\w+)((\\s+([\\w][\\-\\d\\w]*?=(['\"])([^'\"<>]*?)\\5))*)*\\s*/>";
   function parse(xmlString) {
     var tagMap = {};
@@ -107,11 +107,17 @@
         var random = uuid();
         var identifier = '\\$\\{(.*?)\\}';
         var identifier_g = new RegExp(identifier, 'g');
-        var children = (item.match(identifier_g) || []).map(function (item) {
+        var content = (item.match(new RegExp(tag)) || [])[7] || '';
+        var children = (content.match(identifier_g) || []).map(function (item) {
           var uuid = (item.match(new RegExp(identifier)) || [])[1] || '';
           var child = tagMap[uuid];
           delete tagMap[uuid];
           return child;
+        });
+        content.replace(identifier_g, '&&&&').split('&&&&').forEach(function (item, index) {
+          if (item.trim()) {
+            children.splice(index, 0, item.trim());
+          }
         });
         xmlString = xmlString.replace(item, "${".concat(random, "}"));
         tagMap[random] = {
@@ -139,16 +145,25 @@
       var obj = {};
       var attr = {};
       var reg = "([\\w][\\-\\d\\w]*?)=((['\"])([^'\"<>]*?)\\3)";
-      var attrString = (data.xml.match(new RegExp(tag)) || data.xml.match(new RegExp(openTag)) || [])[2] || '';
+      var attrString = data.xml ? (data.xml.match(new RegExp(tag)) || data.xml.match(new RegExp(openTag)) || [])[2] || '' : '';
+      var text = data.xml ? undefined : data;
       (attrString.match(new RegExp(reg, 'g')) || []).forEach(function (item) {
         var a = item.match(reg);
         attr[a[1]] = a[4];
       });
-      obj[data.tag] = _objectSpread2(_objectSpread2({}, attr), {}, {
-        children: data.children.map(function (item) {
-          return nodeParse(item);
-        })
-      });
+
+      if (data.tag) {
+        obj[data.tag] = _objectSpread2(_objectSpread2({}, attr), {}, {
+          children: (data.children || []).map(function (item) {
+            return nodeParse(item);
+          })
+        });
+      } else {
+        obj.text = {
+          text: text
+        };
+      }
+
       return obj;
     }
   }
@@ -175,7 +190,7 @@
   function node(tag, data) {
     var dataKey = Object.keys(data);
     var attrString = dataKey.filter(function (key) {
-      return _typeof(data[key]) !== 'object';
+      return _typeof(data[key]) !== 'object' && key !== 'text';
     }).map(function (key) {
       return "".concat(key, "=\"").concat(data[key], "\"");
     }).join(' ');
@@ -185,12 +200,12 @@
     }).map(function (key) {
       return generate(data[key], key);
     });
-    return tag !== 'children' ? data.children.length ? "<".concat(tag).concat(attrString, ">").concat(children, "</").concat(tag, ">") : "<".concat(tag).concat(attrString, " />") : children;
+    return tag !== 'children' ? tag !== 'text' ? data.children && data.children.length ? "<".concat(tag).concat(attrString, ">").concat(children, "</").concat(tag, ">") : "<".concat(tag).concat(attrString, " />") : data.text : children;
   }
 
   var index = {
     parse: parse,
-    generate: generateXML
+    stringify: generateXML
   };
 
   return index;
