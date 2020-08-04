@@ -10,7 +10,6 @@ export default function parse (xmlString) {
   const b = stringReplace(tagg, new RegExp(tag), xmlString, tagMap)
   xmlString = b.xml
 
-  console.log(tagMap)
   return Object.keys(tagMap).map(key => {
     const node = nodeParse(tagMap[key])
     return node
@@ -74,11 +73,17 @@ function nodeParse (data) {
         const a = item.match(reg)
         attr[a[1]] = a[4]
       })
-    obj[data.tag || 'text'] = {
-      ...attr,
-      text,
-      children: (data.children || []).map(item => nodeParse(item))
+    if (data.tag) {
+      obj[data.tag] = {
+        ...attr,
+        children: (data.children || []).map(item => nodeParse(item))
+      }
+    } else {
+      obj.text = {
+        text
+      }
     }
+
     return obj
   }
 }
