@@ -1,5 +1,5 @@
 {
-    "name": "XML",
+    "name": "@falseLuffy/XML",
     "version": "0.0.1",
     "description": "",
     "main": "./dist/XML.mini.js",
@@ -11,7 +11,7 @@
     "keywords": [],
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/falseLuffy/OneSocket.git"
+        "url": "git+https://github.com/falseLuffy/XML.git"
     },
     "author": "falseLuffy",
     "license": "ISC",
