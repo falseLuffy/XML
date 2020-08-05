@@ -2,8 +2,9 @@
 
 ## API
 
-stringfy
-parse
+* stringfy
+
+* parse
 
 
 ```
